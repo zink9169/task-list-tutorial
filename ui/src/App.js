@@ -18,21 +18,20 @@ function App() {
   const fetchTasks = async () => {
     try {
       const { data } = await axios.get(API_URl);
-
       setTasks(data);
     } catch (err) {
-      console.log(err);
+      console.error("Error fetching tasks:", err);
     }
-
-    useEffect(() => {
-      fetchTasks();
-    }, []);
   };
+
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <AddTaskForm fetchTasks={fetchTasks} />
-
       {tasks.map((task) => (
         <Task task={task} key={task.id} fetchTasks={fetchTasks} />
       ))}

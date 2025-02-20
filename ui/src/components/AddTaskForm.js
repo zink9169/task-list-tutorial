@@ -3,27 +3,34 @@ import TextField from "@mui/material/TextField";
 import { Button, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import axios from "axios";
+import { API_URl } from "../util";
+
 const AddTaskForm = ({ fetchTasks }) => {
   const [newTask, setNewTask] = useState("");
+  const [isAdding, setIsAdding] = useState(false); // Prevent multiple clicks
 
   const addNewTask = async () => {
+    if (!newTask.trim()) return; // Prevent empty tasks
+    setIsAdding(true);
+
     try {
       await axios.post(API_URl, {
-        name: newTask,
+        name: newTask.trim(),
         completed: false,
       });
 
       await fetchTasks();
-
-      setNewTask("");
+      setNewTask(""); // Clear input after successful addition
     } catch (err) {
-      console.log(err);
+      console.error("Error adding task:", err);
+    } finally {
+      setIsAdding(false); // Re-enable button after request
     }
   };
 
   return (
     <div>
-      <Typography align="center" variant="h2" paddingTop={2} paddingBottom={2}>
+      <Typography align="center" variant="h4" paddingY={2}>
         My Task List
       </Typography>
       <div className="addTaskForm">
@@ -31,14 +38,13 @@ const AddTaskForm = ({ fetchTasks }) => {
           size="small"
           label="Task"
           variant="outlined"
+          value={newTask} // Bind input value
           onChange={(e) => setNewTask(e.target.value)}
         />
         <Button
-          disabled={!newTask.length}
+          disabled={isAdding || !newTask.trim().length}
           variant="outlined"
-          onClick={() => {
-            addNewTask();
-          }}
+          onClick={addNewTask}
         >
           <AddIcon />
         </Button>
